@@ -1,0 +1,30 @@
+﻿<div class="text-center">
+
+    @model ListaContatoModel
+
+    <hr />
+    <h2>Lista de Contatos</h2>
+    <hr />
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nome</th>
+                <th>Celular</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contato in Model.Lista)
+            {
+                <tr>
+                    <td>@contato.Id.ToString("D4")</td>
+                    <td>@contato.Nome</td>
+                    <td>@contato.Celular</td>
+                    <td>@contato.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
