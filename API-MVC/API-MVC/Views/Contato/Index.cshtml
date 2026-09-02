@@ -106,12 +106,30 @@
         @foreach (Contatos.Models.ContatoModel c in Model.ListaContatos)
         {
             <tr>
-                <td>@c.Id</td>
-                <td>@c.Nome</td>
-                <td>@c.Email</td>
-                <td>@c.Celular</td>
-                <td>@c.Nascimento</td>
-                <td>@c.CPF</td>
+                <td>
+                    @Html.ActionLink("Id", "Ordena", new { Id = "Id"},
+                new {title = "Clique para ordenar a lista por Id!", @class = "meuLink"})
+                </td>
+                <td>
+                    @Html.ActionLink("Nome", "Ordena", new { Id = "Id"},
+                new {title = "Clique para ordenar a lista por nome!", @class = "meuLink"})
+                </td>
+                <td>
+                    @Html.ActionLink("Email", "Ordena", new { Id = "Id"},
+                new {title = "Clique para ordenar a lista por e-mail!", @class = "meuLink"})
+                </td>
+                <td>
+                    @Html.ActionLink("Celular", "Ordena", new { Id = "Id"},
+                new {title = "Clique para ordenar a lista por celular!", @class = "meuLink"})
+                </td>
+                <td>
+                    @Html.ActionLink("Nascimento", "Ordena", new { Id = "Id"},
+                new {title = "Clique para ordenar a lista por data de nascimento!", @class = "meuLink"})
+                </td>
+                <td>
+                    @Html.ActionLink("CPF", "Ordena", new { Id = "Id"},
+                new {title = "Clique para ordenar a lista por CPF!", @class = "meuLink"})
+                </td>
             </tr>
         }
     </tbody>
@@ -135,7 +153,7 @@
 
 
 <script>
-    
+
     // MÁSCARA DO CPF
     document.getElementById("cpf").addEventListener("input", function (e) {
 
