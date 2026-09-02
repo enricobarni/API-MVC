@@ -45,6 +45,38 @@ public class ContatoController : Controller
         return View(vm);
     }
 
+    public ActionResult Ordena(string nome)
+    {
+        HttpContext.Session.SetString("ordena", nome); // Coloca na "sessão" "ordena" o texto recebido no ‘nome’
+        Ordenar();
+        return RedirectToAction("Index");
+
+    }
+
+    public void Ordenar()
+    {
+        String? nome = HttpContext.Session.GetString("ordena");
+        if (nome == null)
+        {
+            return;
+        }
+        switch (nome)
+        {
+            case "Id": lista = lista.OrderBy(x => x.Id).ToList(); break;
+
+            case "nome": lista = lista.OrderBy(x => x.Id).ToList(); break;
+
+            case "email": lista = lista.OrderBy(x => x.Email).ToList(); break;
+
+            case "celular": lista = lista.OrderBy(x => x.Email).ToList(); break;
+
+            case "nascimento": lista = lista.OrderBy(x => x.Email).ToList(); break;
+
+            case "cpf": lista = lista.OrderBy(x => x.Email).ToList(); break;
+        }
+
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public ActionResult Index(ContatoViewModel vm)
