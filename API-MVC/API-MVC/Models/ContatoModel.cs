@@ -1,42 +1,56 @@
-﻿namespace API_MVC.Models
+﻿using MessagePack;
+
+namespace Contatos.Models;
+
+[MessagePackObject(AllowPrivate = true)]
+public class ContatoModel : IComparable<ContatoModel>
 {
-    public class ContatoModel : IComparable<ContatoModel>
+    [Key(0)]
+    public string Id { get; set; } = "";
+
+    [Key(1)]
+    public string Nome { get; set; } = "";
+
+    [Key(2)]
+    public string Email { get; set; } = "";
+
+    [Key(3)]
+    public string Celular { get; set; } = "";
+
+    [Key(4)]
+    public string Nascimento { get; set; } = "";
+
+    [Key(5)]
+    public string CPF { get; set; } = "";
+
+    public static int contador { get; set; } = 1;
+
+    [SerializationConstructor]
+    public ContatoModel(string id, string nome, string email, string celular, string nascimento, string cpf)
     {
-        public long Id { get; set; }
-        public string Nome { get; set; }
-        public string Celular { get; set; }
-        public string Email { get; set; }
-        public string Cpf { get; set; }
-
-        private static long Contador = 0;
-
-        public ContatoModel(String Nome, String Celular, String Email, String Cpf)
-        {
-            this.Nome = Nome;
-            this.Celular = Celular;
-            this.Email = Email;
-            this.Cpf = Cpf;
-            Id = Contador++;
-        }
-
-        public int CompareTo(ContatoModel nome)
-        {
-            return Nome.CompareTo(nome.Nome);
-        }
+        Id = id;
+        Nome = nome;
+        Email = email;
+        Celular = celular;
+        Nascimento = nascimento;
+        CPF = cpf;
     }
 
-    public class ListaContatoModel 
+    public ContatoModel()
     {
-        public List<ContatoModel> Lista = new List<ContatoModel>
-        {
-            new ContatoModel("Ana Silva", "9 9123 4567", "ana.silva@yahoo.com", "123.456.789-00"),
-            new ContatoModel("Bruno Costa", "9 9234 5678", "bruno.costa@yahoo.com", "234.567.890-11"),
-            new ContatoModel("Carlos Souza", "9 9345 6789", "carlos.souza@yahoo.com", "345.678.901-22"),
-            new ContatoModel("Daniela Lima", "9 9456 7890", "daniela.lima@yahoo.com", "456.789.012-33"),
-            new ContatoModel("Eduardo Ribeiro", "9 9567 8901", "eduardo.ribeiro@yahoo.com", "567.890.123-44"),
-            new ContatoModel("Maria Antônia", "9 9877 6754", "maria.antonia@yahoo.com", "284.591.730-80"),
-            new ContatoModel("Carlos Eduardo", "9 9866 9950", "carlos.eduardo@yahoo.com", "519.304.820-41"),
-            new ContatoModel("João Pedro", "9 9123 4567", "joao.pedro@gmail.com", "842.167.390-55")
-        };
     }
+
+    int IComparable<ContatoModel>.CompareTo(ContatoModel? other)
+    {
+        if (Nome == null || other == null || other.Nome == null)
+            return 0;
+
+        return Nome.CompareTo(other.Nome);
+    }
+}
+
+public class ContatoViewModel
+{
+    public ContatoModel NovoContato { get; set; } = new ContatoModel();
+    public List<ContatoModel> ListaContatos { get; set; } = new List<ContatoModel>();
 }

@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v6.0": {
       "API-MVC/1.0.0": {
         "dependencies": {
+          "MessagePack.Annotations": "3.1.8",
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": "6.0.18",
           "Swashbuckle.AspNetCore": "6.6.2"
         },
@@ -557,7 +558,7 @@
       },
       "MessagePack/2.1.152": {
         "dependencies": {
-          "MessagePack.Annotations": "2.1.152",
+          "MessagePack.Annotations": "3.1.8",
           "Microsoft.Bcl.AsyncInterfaces": "5.0.0",
           "System.Memory": "4.5.4",
           "System.Reflection.Emit": "4.6.0",
@@ -572,11 +573,11 @@
           }
         }
       },
-      "MessagePack.Annotations/2.1.152": {
+      "MessagePack.Annotations/3.1.8": {
         "runtime": {
           "lib/netstandard2.0/MessagePack.Annotations.dll": {
-            "assemblyVersion": "2.1.0.0",
-            "fileVersion": "2.1.152.29568"
+            "assemblyVersion": "3.1.8.0",
+            "fileVersion": "3.1.8.0"
           }
         }
       },
@@ -2469,12 +2470,12 @@
       "path": "messagepack/2.1.152",
       "hashPath": "messagepack.2.1.152.nupkg.sha512"
     },
-    "MessagePack.Annotations/2.1.152": {
+    "MessagePack.Annotations/3.1.8": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-RONktDA/HA641ds/2bfOqYSVew8o8EJMcQ1P4M1J77QGgbzWiWt3nBHvCAwlx0VfO6K9S8xq4b5OLD2CUnhtCg==",
-      "path": "messagepack.annotations/2.1.152",
-      "hashPath": "messagepack.annotations.2.1.152.nupkg.sha512"
+      "sha512": "sha512-SitOtZ4tOlAZZPF7p52M7143F+Cuz7o/aU0MrtAXX0+ZkPXzDNroOFhzzE2ogMFThsoEW/E6akXVVcBFM9ZKaw==",
+      "path": "messagepack.annotations/3.1.8",
+      "hashPath": "messagepack.annotations.3.1.8.nupkg.sha512"
     },
     "MessagePackAnalyzer/2.1.152": {
       "type": "package",

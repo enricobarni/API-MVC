@@ -1,31 +1,212 @@
-﻿using API_MVC.Models;
-using Contatos.Models;
+﻿using Contatos.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API_MVC.Controllers
-{
-    public class ContatoController : Controller
-    {
-        public ActionResult Index()
-        {
-            {
-                ContatoViewModel vm = new ContatoViewModel
-                {
-                    ListaContatos = lista
-                };
+namespace Contatos.Controllers;
 
-                if (System.IO.File.Exists("Dados.Txt"))
+public class ContatoController : Controller
+{
+    private static List<ContatoModel> lista = new List<ContatoModel>();
+    private readonly IWebHostEnvironment _env;
+
+    public ContatoController(IWebHostEnvironment env)
+    {
+        _env = env;
+    }
+
+    private string ArquivoDados => Path.Combine(_env.ContentRootPath, "Dados.txt");
+
+    public ActionResult Index()
+    {
+        ContatoViewModel vm = new ContatoViewModel
+        {
+            ListaContatos = lista
+        };
+
+        try
+        {
+            if (System.IO.File.Exists(ArquivoDados))
+            {
+                lista = vm.ListaContatos = Serializa.load(ArquivoDados);
+
+                if (lista.Count > 0)
                 {
-                    lista = vm.ListaContatos = (List<ContatoModel>)Serializa.load("Dados.Txt");
                     string? maiorId = lista.Max(c => c.Id);
-                    if (maiorId != null && maiorId != "")
-                    {
+
+                    if (!string.IsNullOrEmpty(maiorId))
                         ContatoModel.contador = int.Parse(maiorId) + 1;
-                    }
                 }
-                return View(vm);
+            }
+        }
+        catch
+        {
+            // Mantém o comportamento demonstrado no material.
+        }
+
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Index(ContatoViewModel vm)
+    {
+        try
+        {
+            lista.Sort();
+
+            // VALIDAÇÃO DO NOME
+            if (string.IsNullOrWhiteSpace(vm.NovoContato.Nome))
+            {
+                ModelState.AddModelError(
+                    "NovoContato.Nome",
+                    "Nome do contato não pode estar em branco.");
+            }
+            else
+            {
+                ContatoModel procura = new ContatoModel(
+                    "",
+                    vm.NovoContato.Nome,
+                    "",
+                    "",
+                    "", ""
+                    );
+
+                int indice = lista.BinarySearch(procura);
+
+                if (indice >= 0)
+                {
+                    ModelState.AddModelError(
+                        "NovoContato.Nome",
+                        $"Este nome, '{vm.NovoContato.Nome}' já está cadastrado.");
+                }
             }
 
+            // VALIDAÇÃO DO EMAIL
+            bool emailExiste = lista.Any(c =>
+                c.Email.Equals(
+                    vm.NovoContato.Email ?? "",
+                    StringComparison.OrdinalIgnoreCase));
+
+            if (emailExiste)
+            {
+                ModelState.AddModelError(
+                    "NovoContato.Email",
+                    $"Este email, '{vm.NovoContato.Email}' já está cadastrado.");
+            }
+
+            // VALIDAÇÃO DA DATA DE NASCIMENTO
+            if (string.IsNullOrWhiteSpace(vm.NovoContato.Nascimento))
+            {
+                ModelState.AddModelError(
+                    "NovoContato.Nascimento",
+                    "Data de nascimento é obrigatória.");
+            }
+            else if (DateTime.TryParse(
+                vm.NovoContato.Nascimento,
+                out DateTime nascimento))
+            {
+                DateTime hoje = DateTime.Today;
+
+                if (nascimento > hoje)
+                {
+                    ModelState.AddModelError(
+                        "NovoContato.Nascimento",
+                        "A data de nascimento não pode ser futura.");
+                }
+                else if (nascimento < hoje.AddYears(-100))
+                {
+                    ModelState.AddModelError(
+                        "NovoContato.Nascimento",
+                        "O contato não pode ter mais de 100 anos.");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(
+                    "NovoContato.Nascimento",
+                    "Data de nascimento inválida.");
+            }
+
+            // VALIDAÇÃO DO CPF
+            if (string.IsNullOrWhiteSpace(vm.NovoContato.CPF))
+            {
+                ModelState.AddModelError(
+                    "NovoContato.CPF",
+                    "CPF é obrigatório.");
+            }
+            else if (!ValidarCPF(vm.NovoContato.CPF))
+            {
+                ModelState.AddModelError(
+                    "NovoContato.CPF",
+                    "CPF inválido.");
+            }
+
+            // SE TUDO ESTIVER CORRETO, SALVA
+            if (ModelState.IsValid)
+            {
+                vm.NovoContato.Id =
+                    (ContatoModel.contador++).ToString("D4");
+
+                lista.Add(vm.NovoContato);
+
+                lista.Sort();
+
+                Serializa.save(lista, ArquivoDados);
+
+                vm.NovoContato = new ContatoModel();
+            }
+
+            vm.ListaContatos = lista;
         }
+        catch
+        {
+            vm.ListaContatos = lista;
+        }
+
+        return View(vm);
+    }
+
+    // MÉTODO PARA VALIDAR CPF
+    private bool ValidarCPF(string cpf)
+    {
+        cpf = new string(cpf.Where(char.IsDigit).ToArray());
+
+        if (cpf.Length != 11)
+            return false;
+
+        // Impede CPFs como 11111111111
+        if (cpf.Distinct().Count() == 1)
+            return false;
+
+        // PRIMEIRO DÍGITO
+        int soma = 0;
+
+        for (int i = 0; i < 9; i++)
+        {
+            soma += int.Parse(cpf[i].ToString()) * (10 - i);
+        }
+
+        int resto = soma % 11;
+
+        int digito1 = resto < 2 ? 0 : 11 - resto;
+
+        if (digito1 != int.Parse(cpf[9].ToString()))
+            return false;
+
+        // SEGUNDO DÍGITO
+        soma = 0;
+
+        for (int i = 0; i < 10; i++)
+        {
+            soma += int.Parse(cpf[i].ToString()) * (11 - i);
+        }
+
+        resto = soma % 11;
+
+        int digito2 = resto < 2 ? 0 : 11 - resto;
+
+        if (digito2 != int.Parse(cpf[10].ToString()))
+            return false;
+
+        return true;
     }
 }
