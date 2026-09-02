@@ -17,16 +17,11 @@ public class ContatoController : Controller
 
     public ActionResult Index()
     {
-        ContatoViewModel vm = new ContatoViewModel
-        {
-            ListaContatos = lista
-        };
-
         try
         {
             if (System.IO.File.Exists(ArquivoDados))
             {
-                lista = vm.ListaContatos = Serializa.load(ArquivoDados);
+                lista = Serializa.load(ArquivoDados);
 
                 if (lista.Count > 0)
                 {
@@ -42,6 +37,13 @@ public class ContatoController : Controller
             // Mantém o comportamento demonstrado no material.
         }
 
+        Ordenar();
+
+        ContatoViewModel vm = new ContatoViewModel
+        {
+            ListaContatos = lista
+        };
+
         return View(vm);
     }
 
@@ -55,24 +57,26 @@ public class ContatoController : Controller
 
     public void Ordenar()
     {
-        String? nome = HttpContext.Session.GetString("ordena");
+        string? nome = HttpContext.Session.GetString("ordena");
         if (nome == null)
         {
             return;
         }
         switch (nome)
         {
-            case "Id": lista = lista.OrderBy(x => x.Id).ToList(); break;
+            case "id": lista = lista.OrderBy(x => x.Id).ToList(); break;
 
-            case "nome": lista = lista.OrderBy(x => x.Id).ToList(); break;
+            case "nome": lista = lista.OrderBy(x => x.Nome).ToList(); break;
 
             case "email": lista = lista.OrderBy(x => x.Email).ToList(); break;
 
-            case "celular": lista = lista.OrderBy(x => x.Email).ToList(); break;
+            case "celular": lista = lista.OrderBy(x => x.Celular).ToList(); break;
 
-            case "nascimento": lista = lista.OrderBy(x => x.Email).ToList(); break;
+            case "telefone": lista = lista.OrderBy(x => x.Telefone).ToList(); break;
 
-            case "cpf": lista = lista.OrderBy(x => x.Email).ToList(); break;
+            case "cpf": lista = lista.OrderBy(x => x.CPF).ToList(); break;
+
+            case "nascimento": lista = lista.OrderBy(x => x.Nascimento).ToList(); break;
         }
 
     }
@@ -81,66 +85,30 @@ public class ContatoController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Index(ContatoViewModel vm)
     {
-        ModelState.Clear();
-
         try
         {
-            if (!ValidarCPF(vm.NovoContato.CPF))
+            if (!String.IsNullOrWhiteSpace(vm.NovoContato.IdBusca))
             {
-                ModelState.AddModelError("NovoContato.Cpf", "CPF Inválido.");
-            }
-            else if (!DateTime.TryParse(vm.NovoContato.Data, out DateTime dt))
-            {
-                ModelState.AddModelError("NovoContato.Data", "Data inválida.");
-            }
-            else if (dt.CompareTo(DateTime.Now) > 0)
-            {
-                ModelState.AddModelError("NovoContato.Data", "Data inválida.");
-            }
-            else if (vm.NovoContato.Nome == "")
-            {
-                ModelState.AddModelError("NovoContato.Nome", "Nome do contato não pode estar em branco.");
-            }
-            else
-            {
-                vm.NovoContato.Nascimento = DateTime.Parse(vm.NovoContato.Data);
-
-                ContatoModel procura = new ContatoModel("", vm.NovoContato.Nome, "", "", "", "", DateTime.Now);
-
-                int indice = lista.BinarySearch(procura);
-
-                if (indice >= 0)
+                vm.selecaoId = int.Parse("0" + vm.NovoContato.IdBusca).ToString("D4");
+                vm.ListaContatos = lista;
+                bool existe = lista.Any(x => x.Id == vm.selecaoId);
+                if (!existe)
                 {
-                    ModelState.AddModelError("NovoContato.Nome", $"Este nome, '{vm.NovoContato.Nome}' já está cadastrado.");
+                    TempData["ErrosModal"] = "Nenhum contato encontrado com este ID !";// (Vamos tratar isso daqui a pouco)                    
                 }
-                else
-                {
-                    // Verifica se o email já existe na lista
-                    bool emailExiste = lista.Any(c => c.Email.Equals(vm.NovoContato.Email, StringComparison.OrdinalIgnoreCase));
-
-                    if (emailExiste)
-                    {
-                        ModelState.AddModelError("NovoContato.Email", $"Este email, '{vm.NovoContato.Email}' já está cadastrado.");
-                    }
-                    else
-                    {
-                        vm.NovoContato.Id = (ContatoModel.contador++).ToString("D4");
-                        lista.Add(vm.NovoContato);
-                        lista.Sort();
-                        Serializa.Save(lista, "Dados.txt");
-                    }
-                }
+                vm.NovoContato.IdBusca = "";
+                return View(vm);
             }
+            vm.NovoContato.Id = (ContatoModel.contador++).ToString("D4");
+            lista.Add(vm.NovoContato);
+            lista.Sort();
+            Serializa.Save(lista, "Dados.txt");
+            vm.NovoContato = new ContatoModel();
             vm.ListaContatos = lista;
-
-            if (ModelState.IsValid)
-            {
-                vm.NovoContato = new ContatoModel();
-            }
         }
         catch (Exception)
         {
-            //
+
         }
 
         return View(vm);

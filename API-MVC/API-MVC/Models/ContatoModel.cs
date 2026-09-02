@@ -53,10 +53,10 @@ public class ContatoModel : IComparable<ContatoModel>
 
     int IComparable<ContatoModel>.CompareTo(ContatoModel? other)
     {
-        if (Nome == null || other == null || other.Nome == null)
+        if (Id == null || other == null || other.Id == null)
             return 0;
 
-        return Nome.CompareTo(other.Nome);
+        return this.Id.CompareTo(other.Id);
     }
 }
 

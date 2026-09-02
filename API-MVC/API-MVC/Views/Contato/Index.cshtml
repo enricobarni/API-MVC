@@ -42,16 +42,19 @@
         </tr>
 
         <tr>
-            <td><label>Data de nascimento:</label></td>
+            <td><label>Telefone:</label></td>
             <td>
-                <input type="date"
-                       name="NovoContato.Nascimento"
-                       value="@Model.NovoContato.Nascimento"
+                <input type="text"
+                       id="telefone"
+                       name="NovoContato.Telefone"
+                       value="@Model.NovoContato.Telefone"
+                       maxlength="15"
+                       placeholder="(00) 00000-0000"
                        style="width:300px" />
             </td>
         </tr>
-
         <tr>
+
             <td><label>CPF:</label></td>
             <td>
                 <input type="text"
@@ -60,6 +63,16 @@
                        value="@Model.NovoContato.CPF"
                        maxlength="14"
                        placeholder="000.000.000-00"
+                       style="width:300px" />
+            </td>
+        </tr>
+
+        <tr>
+            <td><label>Data de nascimento:</label></td>
+            <td>
+                <input type="date"
+                       name="NovoContato.Nascimento"
+                       value="@Model.NovoContato.Nascimento"
                        style="width:300px" />
             </td>
         </tr>
@@ -91,7 +104,7 @@
                 <span>Busca por ID</span>
             </td>
             <td>
-                <input type="number" name="NovoContato.idBusca" style="width=200%" value="@Model.NovoContato.IdBusca" />
+                <input type="number" name="NovoContato.idBusca" value="@Model.NovoContato.IdBusca" />
             </td>
             <td>
                 <button type="submit">Buscar</button>
@@ -108,56 +121,60 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <td>
+            <th>
                 @Html.ActionLink("Id", "Ordena", new { nome = "id"},
                 new {title = "Clique para ordenar a lista por Id!", @class = "meuLink"})
-            </td>
-            <td>
+            </th>
+            <th>
                 @Html.ActionLink("Nome", "Ordena", new { nome = "nome"},
                 new {title = "Clique para ordenar a lista por nome!", @class = "meuLink"})
-            </td>
-            <td>
+            </th>
+            <th>
                 @Html.ActionLink("E-mail", "Ordena", new { nome = "email"},
                 new {title = "Clique para ordenar a lista por e-mail!", @class = "meuLink"})
-            </td>
-            <td>
+            </th>
+            <th>
                 @Html.ActionLink("Celular", "Ordena", new { nome = "celular"},
                 new {title = "Clique para ordenar a lista por celular!", @class = "meuLink"})
-            </td>
-            <td>
+            </th>
+            <th>
+                @Html.ActionLink("Telefone", "Ordena", new { nome = "telefone"},
+                new {title = "Clique para ordenar a lista por telefone!", @class = "meuLink"})
+            </th>
+            <th>
                 @Html.ActionLink("Nascimento", "Ordena", new { nome = "nascimento"},
                 new {title = "Clique para ordenar a lista por data de nascimento!", @class = "meuLink"})
-            </td>
-            <td>
+            </th>
+            <th>
                 @Html.ActionLink("CPF", "Ordena", new { nome = "cpf"},
                 new {title = "Clique para ordenar a lista por CPF!", @class = "meuLink"})
-            </td>
+            </th>
         </tr>
     </thead>
 
     <tbody>
         @foreach (Contatos.Models.ContatoModel c in Model.ListaContatos)
         {
-         <tr class="@(c.Id.Equals(Model.selecaoId) ? " linha-selecionada" : "" )">
+            <tr class="@(c.Id.Equals(Model.selecaoId) ? " linha-selecionada" : "" )">
 
-            <td>@c.Id</td>
-            <td>@c.Nome</td>
-            <td>@c.Email</td>
-            <td>
-                @(!String.IsNullOrWhiteSpace(c.Celular) ?
+                <td>@c.Id</td>
+                <td>@c.Nome</td>
+                <td>@c.Email</td>
+                <td>
+                    @(!String.IsNullOrWhiteSpace(c.Celular) ?
                 string.Format("{0:(##) # ####-####}", long.Parse(c.Celular.Where(char.IsDigit).ToArray())) : " - ")
-            </td>
-            <td>
-                @(!String.IsNullOrWhiteSpace(c.Telefone) ?
+                </td>
+                <td>
+                    @(!String.IsNullOrWhiteSpace(c.Telefone) ?
                 string.Format("{0:(##) # ####-####}", long.Parse(c.Telefone.Where(char.IsDigit).ToArray())) : " - ")
-            </td>
-            <td>
-                @(String.Format("{0:00#-###-###/##}", long.Parse((c.CPF+"").Where(char.IsDigit).ToArray())))
-            </td>
-            <td>
-                @c.Nascimento.ToString("dd/MM/yyyy")
-            </td>
-        </tr>
+                </td>
+                <td>
+                    @c.CPF
+                </td>
+                <td>
+                    @c.Nascimento.ToString("dd/MM/yyyy")
+                </td>
+            </tr>
 
         }
     </tbody>
@@ -178,6 +195,12 @@
 <div class="validation">
     @Html.ValidationMessageFor(m => m.NovoContato.CPF)
 </div>
+
+@if (TempData["ErrosModal"] != null)
+{
+    <partial name="Erros" />
+}
+
 
 
 <script>

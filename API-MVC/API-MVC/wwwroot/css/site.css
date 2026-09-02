@@ -21,3 +21,8 @@ body {
     color: inherit;
     text-decoration: none;
 }
+
+.linha-selecionada {
+    background-color: #d0f0ff;
+    font-weight: bold;
+}
