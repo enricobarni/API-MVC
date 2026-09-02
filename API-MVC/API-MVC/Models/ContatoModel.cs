@@ -18,22 +18,33 @@ public class ContatoModel : IComparable<ContatoModel>
     public string Celular { get; set; } = "";
 
     [Key(4)]
-    public string Nascimento { get; set; } = "";
+    public string Telefone { get; set; } = "";
 
     [Key(5)]
     public string CPF { get; set; } = "";
 
+    [Key(6)]
+    public DateTime Nascimento { get; set; } = new DateTime();
+
+    [IgnoreMember]
+    public String Data { get; set; } = "";
+
+    [IgnoreMember] // Para não confundir a serialização
+    public string? IdBusca { get; set; } = "";
+
+
     public static int contador { get; set; } = 1;
 
     [SerializationConstructor]
-    public ContatoModel(string id, string nome, string email, string celular, string nascimento, string cpf)
+    public ContatoModel(string id, string nome, string email, string celular, string telefone, string cpf, DateTime nascimento)
     {
         Id = id;
         Nome = nome;
         Email = email;
         Celular = celular;
-        Nascimento = nascimento;
+        Telefone = telefone;
         CPF = cpf;
+        Nascimento = nascimento;
     }
 
     public ContatoModel()
@@ -53,4 +64,6 @@ public class ContatoViewModel
 {
     public ContatoModel NovoContato { get; set; } = new ContatoModel();
     public List<ContatoModel> ListaContatos { get; set; } = new List<ContatoModel>();
+    public String selecaoId { get; set; } = "0000";
+
 }

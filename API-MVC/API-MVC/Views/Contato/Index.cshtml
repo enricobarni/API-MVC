@@ -84,6 +84,21 @@
         </tr>
 
     </table>
+    <table style="width:100%">
+        <tr>
+            <td style="width:5%">&nbsp;</td>
+            <td>
+                <span>Busca por ID</span>
+            </td>
+            <td>
+                <input type="number" name="NovoContato.idBusca" style="width=200%" value="@Model.NovoContato.IdBusca" />
+            </td>
+            <td>
+                <button type="submit">Buscar</button>
+            </td>
+            <td style="width:5%">&nbsp;</td>
+        </tr>
+    </table>
 </form>
 
 <hr />
@@ -93,44 +108,57 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>E-Mail</th>
-            <th>Celular</th>
-            <th>Data de Nascimento</th>
-            <th>CPF</th>
+            <td>
+                @Html.ActionLink("Id", "Ordena", new { nome = "id"},
+                new {title = "Clique para ordenar a lista por Id!", @class = "meuLink"})
+            </td>
+            <td>
+                @Html.ActionLink("Nome", "Ordena", new { nome = "nome"},
+                new {title = "Clique para ordenar a lista por nome!", @class = "meuLink"})
+            </td>
+            <td>
+                @Html.ActionLink("E-mail", "Ordena", new { nome = "email"},
+                new {title = "Clique para ordenar a lista por e-mail!", @class = "meuLink"})
+            </td>
+            <td>
+                @Html.ActionLink("Celular", "Ordena", new { nome = "celular"},
+                new {title = "Clique para ordenar a lista por celular!", @class = "meuLink"})
+            </td>
+            <td>
+                @Html.ActionLink("Nascimento", "Ordena", new { nome = "nascimento"},
+                new {title = "Clique para ordenar a lista por data de nascimento!", @class = "meuLink"})
+            </td>
+            <td>
+                @Html.ActionLink("CPF", "Ordena", new { nome = "cpf"},
+                new {title = "Clique para ordenar a lista por CPF!", @class = "meuLink"})
+            </td>
         </tr>
     </thead>
 
     <tbody>
         @foreach (Contatos.Models.ContatoModel c in Model.ListaContatos)
         {
-            <tr>
-                <td>
-                    @Html.ActionLink("Id", "Ordena", new { nome = "id"},
-                new {title = "Clique para ordenar a lista por Id!", @class = "meuLink"})
-                </td>
-                <td>
-                    @Html.ActionLink("Nome", "Ordena", new { nome = "nome"},
-                new {title = "Clique para ordenar a lista por nome!", @class = "meuLink"})
-                </td>
-                <td>
-                    @Html.ActionLink("E-mail", "Ordena", new { nome = "email"},
-                new {title = "Clique para ordenar a lista por e-mail!", @class = "meuLink"})
-                </td>
-                <td>
-                    @Html.ActionLink("Celular", "Ordena", new { nome = "celular"},
-                new {title = "Clique para ordenar a lista por celular!", @class = "meuLink"})
-                </td>
-                <td>
-                    @Html.ActionLink("Nascimento", "Ordena", new { nome = "nascimento"},
-                new {title = "Clique para ordenar a lista por data de nascimento!", @class = "meuLink"})
-                </td>
-                <td>
-                    @Html.ActionLink("CPF", "Ordena", new { nome = "cpf"},
-                new {title = "Clique para ordenar a lista por CPF!", @class = "meuLink"})
-                </td>
-            </tr>
+         <tr class="@(c.Id.Equals(Model.selecaoId) ? " linha-selecionada" : "" )">
+
+            <td>@c.Id</td>
+            <td>@c.Nome</td>
+            <td>@c.Email</td>
+            <td>
+                @(!String.IsNullOrWhiteSpace(c.Celular) ?
+                string.Format("{0:(##) # ####-####}", long.Parse(c.Celular.Where(char.IsDigit).ToArray())) : " - ")
+            </td>
+            <td>
+                @(!String.IsNullOrWhiteSpace(c.Telefone) ?
+                string.Format("{0:(##) # ####-####}", long.Parse(c.Telefone.Where(char.IsDigit).ToArray())) : " - ")
+            </td>
+            <td>
+                @(String.Format("{0:00#-###-###/##}", long.Parse((c.CPF+"").Where(char.IsDigit).ToArray())))
+            </td>
+            <td>
+                @c.Nascimento.ToString("dd/MM/yyyy")
+            </td>
+        </tr>
+
         }
     </tbody>
 </table>

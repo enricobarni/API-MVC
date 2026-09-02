@@ -212,3 +212,4 @@ C:\Users\unisanta\Desktop\API-MVC\API-MVC\API-MVC\obj\Debug\net6.0\API-MVC.dll
 C:\Users\unisanta\Desktop\API-MVC\API-MVC\API-MVC\obj\Debug\net6.0\ref\API-MVC.dll
 C:\Users\unisanta\Desktop\API-MVC\API-MVC\API-MVC\obj\Debug\net6.0\API-MVC.pdb
 C:\Users\unisanta\Desktop\API-MVC\API-MVC\API-MVC\obj\Debug\net6.0\API-MVC.genruntimeconfig.cache
+C:\Users\unisanta\Desktop\API-MVC\API-MVC\API-MVC\obj\Debug\net6.0\API-MVC.csproj.AssemblyReference.cache

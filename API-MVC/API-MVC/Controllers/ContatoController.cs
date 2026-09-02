@@ -81,117 +81,66 @@ public class ContatoController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Index(ContatoViewModel vm)
     {
+        ModelState.Clear();
+
         try
         {
-            lista.Sort();
-
-            // VALIDAÇÃO DO NOME
-            if (string.IsNullOrWhiteSpace(vm.NovoContato.Nome))
+            if (!ValidarCPF(vm.NovoContato.CPF))
             {
-                ModelState.AddModelError(
-                    "NovoContato.Nome",
-                    "Nome do contato não pode estar em branco.");
+                ModelState.AddModelError("NovoContato.Cpf", "CPF Inválido.");
+            }
+            else if (!DateTime.TryParse(vm.NovoContato.Data, out DateTime dt))
+            {
+                ModelState.AddModelError("NovoContato.Data", "Data inválida.");
+            }
+            else if (dt.CompareTo(DateTime.Now) > 0)
+            {
+                ModelState.AddModelError("NovoContato.Data", "Data inválida.");
+            }
+            else if (vm.NovoContato.Nome == "")
+            {
+                ModelState.AddModelError("NovoContato.Nome", "Nome do contato não pode estar em branco.");
             }
             else
             {
-                ContatoModel procura = new ContatoModel(
-                    "",
-                    vm.NovoContato.Nome,
-                    "",
-                    "",
-                    "", ""
-                    );
+                vm.NovoContato.Nascimento = DateTime.Parse(vm.NovoContato.Data);
+
+                ContatoModel procura = new ContatoModel("", vm.NovoContato.Nome, "", "", "", "", DateTime.Now);
 
                 int indice = lista.BinarySearch(procura);
 
                 if (indice >= 0)
                 {
-                    ModelState.AddModelError(
-                        "NovoContato.Nome",
-                        $"Este nome, '{vm.NovoContato.Nome}' já está cadastrado.");
+                    ModelState.AddModelError("NovoContato.Nome", $"Este nome, '{vm.NovoContato.Nome}' já está cadastrado.");
                 }
-            }
-
-            // VALIDAÇÃO DO EMAIL
-            bool emailExiste = lista.Any(c =>
-                c.Email.Equals(
-                    vm.NovoContato.Email ?? "",
-                    StringComparison.OrdinalIgnoreCase));
-
-            if (emailExiste)
-            {
-                ModelState.AddModelError(
-                    "NovoContato.Email",
-                    $"Este email, '{vm.NovoContato.Email}' já está cadastrado.");
-            }
-
-            // VALIDAÇÃO DA DATA DE NASCIMENTO
-            if (string.IsNullOrWhiteSpace(vm.NovoContato.Nascimento))
-            {
-                ModelState.AddModelError(
-                    "NovoContato.Nascimento",
-                    "Data de nascimento é obrigatória.");
-            }
-            else if (DateTime.TryParse(
-                vm.NovoContato.Nascimento,
-                out DateTime nascimento))
-            {
-                DateTime hoje = DateTime.Today;
-
-                if (nascimento > hoje)
+                else
                 {
-                    ModelState.AddModelError(
-                        "NovoContato.Nascimento",
-                        "A data de nascimento não pode ser futura.");
-                }
-                else if (nascimento < hoje.AddYears(-100))
-                {
-                    ModelState.AddModelError(
-                        "NovoContato.Nascimento",
-                        "O contato não pode ter mais de 100 anos.");
-                }
-            }
-            else
-            {
-                ModelState.AddModelError(
-                    "NovoContato.Nascimento",
-                    "Data de nascimento inválida.");
-            }
+                    // Verifica se o email já existe na lista
+                    bool emailExiste = lista.Any(c => c.Email.Equals(vm.NovoContato.Email, StringComparison.OrdinalIgnoreCase));
 
-            // VALIDAÇÃO DO CPF
-            if (string.IsNullOrWhiteSpace(vm.NovoContato.CPF))
-            {
-                ModelState.AddModelError(
-                    "NovoContato.CPF",
-                    "CPF é obrigatório.");
+                    if (emailExiste)
+                    {
+                        ModelState.AddModelError("NovoContato.Email", $"Este email, '{vm.NovoContato.Email}' já está cadastrado.");
+                    }
+                    else
+                    {
+                        vm.NovoContato.Id = (ContatoModel.contador++).ToString("D4");
+                        lista.Add(vm.NovoContato);
+                        lista.Sort();
+                        Serializa.Save(lista, "Dados.txt");
+                    }
+                }
             }
-            else if (!ValidarCPF(vm.NovoContato.CPF))
-            {
-                ModelState.AddModelError(
-                    "NovoContato.CPF",
-                    "CPF inválido.");
-            }
+            vm.ListaContatos = lista;
 
-            // SE TUDO ESTIVER CORRETO, SALVA
             if (ModelState.IsValid)
             {
-                vm.NovoContato.Id =
-                    (ContatoModel.contador++).ToString("D4");
-
-                lista.Add(vm.NovoContato);
-
-                lista.Sort();
-
-                Serializa.save(lista, ArquivoDados);
-
                 vm.NovoContato = new ContatoModel();
             }
-
-            vm.ListaContatos = lista;
         }
-        catch
+        catch (Exception)
         {
-            vm.ListaContatos = lista;
+            //
         }
 
         return View(vm);

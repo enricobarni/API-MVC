@@ -4,7 +4,7 @@ namespace Contatos.Models;
 
 public class Serializa
 {
-    public static void save(List<ContatoModel> lista, string arquivo)
+    public static void Save(List<ContatoModel> lista, string arquivo)
     {
         if (lista == null || lista.Count == 0)
             return;
